@@ -1,7 +1,6 @@
 package pc;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -15,10 +14,13 @@ public class Client extends Thread {
 	private static Scanner sc;
 	private static String username;
 	private static boolean connected = true;
+	private static ClientWindow clientWindow;
 	
 	public static void main(String[] args) throws IOException {
-		sc = new Scanner(System.in);
 		
+		clientWindow = new ClientWindow();
+		
+		sc = new Scanner(System.in);
 		// Receive host ip
 		print("Insert server IP. 'test' for testing server. 'local' to connect to device's current IP");
 		boolean insertHost = false;
@@ -80,7 +82,7 @@ public class Client extends Thread {
 		msgSender();
 		msgReceiver();
 	}
-
+	
 	public static void msgSender() { // Our new thread that sends messages and handles our input
 		new Thread(new Runnable() {
 			@Override
@@ -179,11 +181,13 @@ public class Client extends Thread {
 
 	public static void print(Object object) { // Too lazy lol, might help later one when developed ui
 		System.out.println(object);
+		ClientWindow.printLine(object);
 	}
 
 	public static void exit() {
 		print("Exiting...");
 		connected = false;
+		clientWindow.dispose();
 		try {
 			socket.close();
 		} catch (IOException e) {
