@@ -25,8 +25,6 @@ public class ClientWindow extends JFrame {
 	JButton sendButton;
 	
 	static JLabel textLabel;
-	static String texts = "";
-	
 	
 	public ClientWindow() {
 		super("wingwong");
@@ -44,7 +42,7 @@ public class ClientWindow extends JFrame {
         textField = new JTextField();
         add(textField);
         
-        textLabel = new JLabel();
+        textLabel = new JLabel("<html>");
         textLabel.setVerticalAlignment(JLabel.TOP);
         add(textLabel);
 		
@@ -52,16 +50,28 @@ public class ClientWindow extends JFrame {
 		resizeListener.componentResized(null); // Calls the "function" from listener
 	}
 	
-	public static void printLine(Object text) {
-		texts = texts + text + "\n";
-		textLabel.setText(texts);
+	public static String nextInput = "";
+	public String awaitNextInput() {
+		nextInput = "";
+		while("".equals(nextInput)) {
+			System.out.print("");
+		}
+		return nextInput;
+	}
+	
+	public void print(Object text) {
+		textLabel.setText(textLabel.getText() + text + "<br/>");
 	}
 	
 	ActionListener sendButtonPressed = new ActionListener() {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.println(textField.getText());
-			textField.setText("");
+			String input = textField.getText();
+			if(!input.isEmpty()) {
+				// send to client
+				nextInput = input;
+				textField.setText("");
+			}
 		}
 	};
 	
