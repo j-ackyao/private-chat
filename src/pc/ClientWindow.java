@@ -50,6 +50,7 @@ public class ClientWindow extends JFrame {
         textLabel.setFont(new Font("", Font.PLAIN, 18));
         scrollPane = new JScrollPane(textLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(50);
         add(scrollPane);
 		
 		addComponentListener(resizeListener);
@@ -66,7 +67,12 @@ public class ClientWindow extends JFrame {
 	}
 	
 	public void update() { // Scroll to bottom
-        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+		//if(scrollPane.getVerticalScrollBar().getValue() + scrollPane.getVerticalScrollBar().getWidth() >= scrollPane.getVerticalScrollBar().getMaximum()*0.9) {
+	        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+		//}
+		//print(Double.toString(scrollPane.getVerticalScrollBar().HEIGHT), Data.systemFont);
+		//print(Integer.toString(scrollPane.getVerticalScrollBar().getValue()), Data.systemFont);
+		//print(Integer.toString(scrollPane.getVerticalScrollBar().getMaximum()), Data.systemFont);
 	}
 	
 	public void print(String text, String font) { // Print to clientwindow with given font
@@ -99,6 +105,7 @@ public class ClientWindow extends JFrame {
 			textField.setBounds(7, windowH - textFieldSizeY - 44, textFieldSizeX, textFieldSizeY);
 			sendButton.setBounds(textFieldSizeX + 10, windowH - textFieldSizeY - 44, sendButtonSizeX, sendButtonSizeY);
 	        scrollPane.setBounds(7, 7, windowW - 27, windowH - textFieldSizeY - 55);
+	        textLabel.setBounds(0, 0, scrollPane.getWidth(), scrollPane.getHeight());
 	        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 		}
 	};

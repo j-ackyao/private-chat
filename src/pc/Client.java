@@ -112,9 +112,10 @@ public class Client extends Thread {
 
 				while (connected) {
 					try {
+						clientWindow.update();
 						clientWindow.print(bf.readLine(), Data.clientFont); // Read incoming text
 						Thread.sleep(100); // Need to wait because it updates too early
-						clientWindow.update();
+						//clientWindow.update();
 					} catch (SocketException se) { // Socket disconnected / error
 						print("Server connection severed");
 						exit("error");
