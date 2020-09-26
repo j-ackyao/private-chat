@@ -1,6 +1,5 @@
 package pc;
 
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -10,12 +9,11 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-public class ClientWindow extends JFrame {
-	private static final long serialVersionUID = -3231753162628808049L;
-	
+public class ClientWindowConnector extends JFrame {
+	private static final long serialVersionUID = -5315777353518508058L;
+
 	static int windowW = 1200;
 	static int windowH = 700;
 	
@@ -28,14 +26,13 @@ public class ClientWindow extends JFrame {
 	
 	static JLabel textLabel;
 	
-	static JScrollPane scrollPane;
-	
-	public ClientWindow() {
-		super("Client");
+	public ClientWindowConnector() {
+		super("Connect to...");
 		setLayout(null);
 		setVisible(true);
 		setSize(1200, 700);
 		setResizable(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		sendButton = new JButton("Send");
 		getRootPane().setDefaultButton(sendButton);
@@ -46,11 +43,8 @@ public class ClientWindow extends JFrame {
         add(textField);
         
         textLabel = new JLabel("<html>");
-        textLabel.setVerticalAlignment(JLabel.BOTTOM);
-        textLabel.setFont(new Font("", Font.PLAIN, 18));
-        scrollPane = new JScrollPane(textLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
-        add(scrollPane);
+        textLabel.setVerticalAlignment(JLabel.TOP);
+        add(textLabel);
 		
 		addComponentListener(resizeListener);
 		resizeListener.componentResized(null); // Calls the "function" from listener
@@ -65,12 +59,8 @@ public class ClientWindow extends JFrame {
 		return nextInput;
 	}
 	
-	public void update() { // Scroll to bottom
-        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
-	}
-	
-	public void print(String text, String font) { // Print to clientwindow with given font
-		textLabel.setText(textLabel.getText() + "<p style=" + font + ">" + text + "</p>");
+	public void print(Object text) {
+		textLabel.setText(textLabel.getText() + text + "<br/>");
 	}
 	
 	ActionListener sendButtonPressed = new ActionListener() {
@@ -96,10 +86,9 @@ public class ClientWindow extends JFrame {
 			int sendButtonSizeX = 200;
 			int sendButtonSizeY = 25;
 			
-			textField.setBounds(7, windowH - textFieldSizeY - 44, textFieldSizeX, textFieldSizeY);
+			textField.setBounds(5, windowH - textFieldSizeY - 44, textFieldSizeX, textFieldSizeY);
 			sendButton.setBounds(textFieldSizeX + 10, windowH - textFieldSizeY - 44, sendButtonSizeX, sendButtonSizeY);
-	        scrollPane.setBounds(7, 7, windowW - 27, windowH - textFieldSizeY - 55);
-	        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+	        textLabel.setBounds(5, 5, windowW - 10, windowH - 10);
 		}
 	};
 }

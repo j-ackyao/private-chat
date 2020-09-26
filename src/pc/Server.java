@@ -14,6 +14,7 @@ public class Server extends Thread {
 
 	public static String hostIP;
 	public static ArrayList<Socket> connectedClients;
+	public static ArrayList<String> connectedNames;
 
 	public static void main(String[] args) {
 
@@ -72,7 +73,7 @@ public class Server extends Thread {
 	// clients. Each time this function is called, a new thread is created
 	public static void clientHandler(Socket client) {
 		Thread handler = new Thread() {
-
+			
 			public boolean connected = true;
 			public InputStreamReader isr;
 			public BufferedReader br;
@@ -80,8 +81,16 @@ public class Server extends Thread {
 												// them
 			public PrintWriter clientWriter; // This is used to write to the handler's respective client
 
+			private String username;
+			
 			@Override
 			public void run() {
+				
+				String intro = readClient(); // When user first connects
+				username = intro.replaceAll("'", "").replaceAll(" connected", ""); // Grab their username
+				//connectedNames.add(username);
+				sendToAll(intro);
+				
 				while (connected) { // While client is still connected
 
 					String input = readClient(); // Keeps reading and then sending to all client
@@ -90,12 +99,7 @@ public class Server extends Thread {
 						disconnect(0);
 					} 
 					else {
-						if ("\\".equals(input.split("")[0])) {
-							sendToClient("Command received");
-						} 
-						else {
-							sendToAll(input);
-						}
+						sendToAll(input);
 					}
 
 				}
@@ -113,7 +117,7 @@ public class Server extends Thread {
 				}
 			}
 
-			public void sendToAll(Object object) {
+			public void sendToAll(Object object) { // Send to all Clients
 
 				for (int i = 0; i < connectedClients.size(); i++) { // Find how many clients are connected and loops how
 																	// many times
@@ -127,28 +131,29 @@ public class Server extends Thread {
 				}
 			}
 
-			public void sendToClient(Object object) {
+			public void sendToClient(Object object) { // Send to client privately
 				try {
 					clientWriter = new PrintWriter(client.getOutputStream());
 					clientWriter.println(object);
 					clientWriter.flush();
 				} catch (IOException ioe) {
-
+					
 				}
 			}
 
 			public void disconnect(int status) {
 				connected = false;
-				Server.connectedClients.removeAll(Collections.singleton(client));
+				connectedClients.removeAll(Collections.singleton(client));
+				//connectedNames.removeAll(Collections.singleton(username));
 				try {
 					client.close();
 				} catch (IOException e) {
 
 				}
 				if (status == 0) { // Default exit
-					sendToAll(client + " has disconnected");
+					sendToAll(username + " has disconnected");
 				} else if (status == -1) {
-					sendToAll(client + " has disconnected (Error)");
+					sendToAll(username + " has disconnected (Error)");
 				}
 
 			}

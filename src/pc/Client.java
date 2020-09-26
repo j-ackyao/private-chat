@@ -1,17 +1,17 @@
 package pc;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.Scanner;
 
 public class Client extends Thread {
 
 	private static Socket socket; // Our socket (connection) to the whatever server
-	private static Scanner sc;
 	private static String username;
 	private static boolean connected = true;
 	private static ClientWindow clientWindow;
@@ -19,104 +19,76 @@ public class Client extends Thread {
 	public static void main(String[] args) throws IOException {
 		
 		clientWindow = new ClientWindow();
+		clientWindow.addWindowListener(new WindowListener() {
+			public void windowClosed(WindowEvent e) {}
+			public void windowIconified(WindowEvent e) {}
+			public void windowDeiconified(WindowEvent e) {}
+			public void windowActivated(WindowEvent e) {}
+			public void windowDeactivated(WindowEvent e) {}
+			public void windowOpened(WindowEvent e) {}
+			@Override
+			public void windowClosing(WindowEvent e) {new Thread(()-> {exit("safe");}).start();} // dont worry about this
+		});
 		
 		// Receive host ip
-		clientWindow.print("Insert server IP. 'test' for testing server. 'local' to connect to device's current IP");
+		clientWindow.print("Insert server IP. 'test' for testing server. 'local' to connect to device's current IP", Data.systemFont);
 		boolean insertHost = false;
-		while (!insertHost) { // Loop to prevent empty input
+		while (!insertHost) { // Loop to retry multiple times
 			String input = clientWindow.awaitNextInput();
-			
-			if (!input.isEmpty()) { // If not empty
-				
-				if ("test".equals(input)) { // Set IP to testing server
-					clientWindow.print("Connecting to testing server...");
-					insertHost = connect(Data.testServer);
-				} 
-				
-				else if ("local".equals(input)) { // Set IP to device IP
-					String ip = Data.grabIP(); // Grabs IP of local device
-					
-					if ("-1".equals(ip)) { // This is when it failed to get the IP
-						clientWindow.print("Failed to find device's IP, possible internet connection problem");
-						System.exit(-1);
-					} 
-					
-					else { // Set to desired IP
-						clientWindow.print("Connecting to " + ip + "...");
-						insertHost = connect(ip);
-					}
-				} 
-				
-				else { // Set IP to inputed IP
-					clientWindow.print("Connecting to " + input + "...");
-					insertHost = connect(input);
+
+			if ("test".equals(input)) { // Set IP to testing server
+				clientWindow.print("Connecting to testing server...", Data.systemFont);
+				insertHost = connect(Data.testServer);
+			}
+
+			else if ("local".equals(input)) { // Set IP to device IP
+				String ip = Data.grabIP(); // Grabs IP of local device
+
+				if ("-1".equals(ip)) { // This is when it failed to get the IP
+					clientWindow.print("Failed to find device's IP, possible internet connection problem", Data.systemFont);
+					exit("error");
+				}
+
+				else { // Set to desired IP
+					clientWindow.print("Connecting to " + ip + "...", Data.systemFont);
+					insertHost = connect(ip);
 				}
 			}
-			
-			else { // In case input is empty
-				clientWindow.print("Input empty, please insert a valid IP");
+
+			else { // Set IP to inputed IP
+				clientWindow.print("Connecting to " + input + "...", Data.systemFont);
+				insertHost = connect(input);
 			}
 		}
 
-		clientWindow.print("Insert username");
-		boolean insertUsername = false;
-		while (!insertUsername) { // Loop to prevent empty input
-			String input = clientWindow.awaitNextInput();
-
-			if (!input.isEmpty()) { // If not empty
-				insertUsername = true;
-				username = input;
-			}
-
-			else { // In case input is empty
-				clientWindow.print("Input empty, please insert a valid username");
-			}
-		}
-		clientWindow.print("Logged on as '" + username + "'");
+		clientWindow.print("Insert username", Data.systemFont);
+		String input = clientWindow.awaitNextInput();
+		username = input;
+		clientWindow.print("Logged on as '" + username + "'", Data.systemFont);
 		// Create our msgReceiver and msgSender threads, which basically handles everything
 		msgSender();
 		msgReceiver();
 	}
 	
-	
-	
 	public static void msgSender() { // Our new thread that sends messages and handles our input
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				PrintWriter pr = null;
-				try { // Create our outputting thing
-					pr = new PrintWriter(socket.getOutputStream());
-				} catch (Exception e) {
-					clientWindow.print("Failed to get output stream of server");
-				}
-				
-				pr.println("'" + username + "' connected");
-				pr.flush();
-				
-				while (connected) { // Actual reading
-					String input = sc.nextLine(); // Client input
-					if (!input.isEmpty()) { // Check if input is empty
+				sendToServer("'" + username + "' connected");
 
-						if ("\\".equals(input.split("")[0])) { // If input starts with backslash (will be our commands)
-							switch (input.substring(1)) { // Remove slash
-							
-							case "usercount":
-								pr.println("\\usercount");
-								pr.flush();
-								break;
-							
-							case "exit": // Proper exit
-								pr.println(username + " has disconnected");
-								pr.flush();
-								exit();
-								break;
-							}
-						} else { // If not commands, send to receiver
-							pr.println(username + ": " + input);
-							pr.flush();
-						}
-					}
+				while (connected) { // Actual reading
+					String input = clientWindow.awaitNextInput(); // Client input
+					sendToServer(username + ": " + input);
+				}
+			}
+
+			public void sendToServer(Object object) {
+				try { // Create our outputting thing
+					PrintWriter pr = new PrintWriter(socket.getOutputStream());
+					pr.println(object);
+					pr.flush();
+				} catch (IOException ioe) {
+					clientWindow.print("Failed to get output stream of server, '" + object + "' was not sent.", Data.systemErrorFont);
 				}
 			}
 		}).start();
@@ -134,17 +106,22 @@ public class Client extends Thread {
 					isr = new InputStreamReader(socket.getInputStream());
 					bf = new BufferedReader(isr);
 				} catch (IOException e) {
-
+					print("Failed to get input stream of server");
+					exit("error");
 				}
 
 				while (connected) {
 					try {
-						clientWindow.print(bf.readLine()); // Read incoming text
+						clientWindow.print(bf.readLine(), Data.clientFont); // Read incoming text
+						Thread.sleep(100); // Need to wait because it updates too early
+						clientWindow.update();
 					} catch (SocketException se) { // Socket disconnected / error
-						clientWindow.print("Server connection severed");
-						exit();
+						print("Server connection severed");
+						exit("error");
 					} catch (IOException ioe) { // IO error, usually doesnt happen
-						clientWindow.print("Failed to receive text");
+						clientWindow.print("Failed to receive text", Data.systemFont);
+					} catch (InterruptedException e) {
+						// Failed to scroll down
 					}
 				}
 			}
@@ -158,7 +135,7 @@ public class Client extends Thread {
 			// Create a socket to the ip and port of 8888
 			socket = new Socket(ip, Data.port);
 			// If managed to connect, it'll move to here
-			clientWindow.print("Successfully connected");
+			clientWindow.print("Successfully connected", Data.systemFont);
 			return true;
 		}
 
@@ -166,12 +143,12 @@ public class Client extends Thread {
 
 			if (retries < 5) { // If retry under 5 times, this prevents infinite loop
 				retries++;
-				clientWindow.print("Failed to connect, retrying... " + retries);
+				clientWindow.print("Failed to connect, retrying... " + retries, Data.systemFont);
 				connect(ip); // Try to connect again
 			}
 
 			else { // If already retried 5 times
-				clientWindow.print("Failed to connect after 5 retries, please try again.");
+				clientWindow.print("Failed to connect after 5 retries, please try again.", Data.systemFont);
 				retries = 0;
 				return false;
 			}
@@ -179,13 +156,34 @@ public class Client extends Thread {
 		return false;
 	}
 
-	public static void exit() {
-		clientWindow.print("Exiting...");
+	public static void print(Object object) {
+		System.out.println(object);
+	}
+	
+	public static void exit(String exitType) {
 		connected = false;
 		try {
 			socket.close();
 		} catch (IOException | NullPointerException e) {
-			//do nothing lol
+			// do nothing lol
+		}
+		switch(exitType) {
+		
+		case "safe":
+			System.out.println("Exiting...");
+			connected = false;
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {}
+			System.exit(0);
+			
+		case "error":
+			System.out.println("Press 'enter' to exit");
+			clientWindow.setVisible(false);
+			try {
+				System.in.read();
+			} catch (IOException e) {}
+			System.exit(0);
 		}
 	}
 }
