@@ -64,7 +64,6 @@ public class Client extends Thread {
 		clientWindow.print("Insert username", Data.systemFont);
 		String input = clientWindow.awaitNextInput();
 		username = input;
-		clientWindow.print("Logged on as '" + username + "'", Data.systemFont);
 		// Create our msgReceiver and msgSender threads, which basically handles everything
 		msgSender();
 		msgReceiver();
@@ -112,17 +111,14 @@ public class Client extends Thread {
 
 				while (connected) {
 					try {
-						clientWindow.update();
-						clientWindow.print(bf.readLine(), Data.clientFont); // Read incoming text
-						Thread.sleep(100); // Need to wait because it updates too early
-						//clientWindow.update();
+						String[] input = bf.readLine().split("\\\\", 2); // Split incoming string into font and actual text
+						clientWindow.update(); // Idk why the update works when here
+						clientWindow.print(input[1], input[0]); // Read incoming text
 					} catch (SocketException se) { // Socket disconnected / error
 						print("Server connection severed");
 						exit("error");
 					} catch (IOException ioe) { // IO error, usually doesnt happen
-						clientWindow.print("Failed to receive text", Data.systemFont);
-					} catch (InterruptedException e) {
-						// Failed to scroll down
+						clientWindow.print("Failed to receive text", Data.systemErrorFont);
 					}
 				}
 			}

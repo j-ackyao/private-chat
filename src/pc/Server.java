@@ -89,7 +89,7 @@ public class Server extends Thread {
 				String intro = readClient(); // When user first connects
 				username = intro.replaceAll("'", "").replaceAll(" connected", ""); // Grab their username
 				//connectedNames.add(username);
-				sendToAll(intro);
+				sendToAll(intro, Data.systemFont);
 				
 				while (connected) { // While client is still connected
 
@@ -99,7 +99,7 @@ public class Server extends Thread {
 						disconnect(0);
 					} 
 					else {
-						sendToAll(input);
+						sendToAll(input, Data.clientFont);
 					}
 
 				}
@@ -117,13 +117,13 @@ public class Server extends Thread {
 				}
 			}
 
-			public void sendToAll(Object object) { // Send to all Clients
+			public void sendToAll(String content, String font) { // Send to all Clients
 
 				for (int i = 0; i < connectedClients.size(); i++) { // Find how many clients are connected and loops how
 																	// many times
 					try {
 						serverWriter = new PrintWriter(connectedClients.get(i).getOutputStream());
-						serverWriter.println(object);
+						serverWriter.println(font + "\\" + content);
 						serverWriter.flush();
 					} catch (IOException ioe) {
 						System.out.println("Failed to sending to " + connectedClients.get(i));
@@ -131,6 +131,7 @@ public class Server extends Thread {
 				}
 			}
 
+			@SuppressWarnings("unused")
 			public void sendToClient(Object object) { // Send to client privately
 				try {
 					clientWriter = new PrintWriter(client.getOutputStream());
@@ -151,9 +152,9 @@ public class Server extends Thread {
 
 				}
 				if (status == 0) { // Default exit
-					sendToAll(username + " has disconnected");
+					sendToAll(username + " has disconnected", Data.systemFont);
 				} else if (status == -1) {
-					sendToAll(username + " has disconnected (Error)");
+					sendToAll(username + " has disconnected (Error)", Data.systemErrorFont);
 				}
 
 			}
