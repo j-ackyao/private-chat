@@ -77,6 +77,10 @@ public class ClientWindow extends JFrame {
 	
 	public void print(String text, String font) { // Print to clientwindow with given font
 		textLabel.setText(textLabel.getText() + "<p style=" + font + ">" + text + "</p>");
+		try {
+			Thread.sleep(10);
+			update();
+		} catch (InterruptedException e) {}
 	}
 	
 	ActionListener sendButtonPressed = new ActionListener() {
@@ -105,7 +109,7 @@ public class ClientWindow extends JFrame {
 			textField.setBounds(7, windowH - textFieldSizeY - 44, textFieldSizeX, textFieldSizeY);
 			sendButton.setBounds(textFieldSizeX + 10, windowH - textFieldSizeY - 44, sendButtonSizeX, sendButtonSizeY);
 	        scrollPane.setBounds(7, 7, windowW - 27, windowH - textFieldSizeY - 55);
-	        textLabel.setBounds(0, 0, scrollPane.getWidth(), scrollPane.getHeight());
+	        textLabel.setBounds(0, 0, scrollPane.getWidth() - scrollPane.getVerticalScrollBar().getWidth(), scrollPane.getHeight());
 	        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 		}
 	};

@@ -64,6 +64,7 @@ public class Client extends Thread {
 		clientWindow.print("Insert username", Data.systemFont);
 		String input = clientWindow.awaitNextInput();
 		username = input;
+		clientWindow.setTitle(username);
 		// Create our msgReceiver and msgSender threads, which basically handles everything
 		msgSender();
 		msgReceiver();
@@ -112,7 +113,6 @@ public class Client extends Thread {
 				while (connected) {
 					try {
 						String[] input = bf.readLine().split("\\\\", 2); // Split incoming string into font and actual text
-						clientWindow.update(); // Idk why the update works when here
 						clientWindow.print(input[1], input[0]); // Read incoming text
 					} catch (SocketException se) { // Socket disconnected / error
 						print("Server connection severed");
@@ -175,7 +175,7 @@ public class Client extends Thread {
 			System.exit(0);
 			
 		case "error":
-			System.out.println("Press 'enter' to exit");
+			System.out.println("Press 'enter' to continue...");
 			clientWindow.setVisible(false);
 			try {
 				System.in.read();
