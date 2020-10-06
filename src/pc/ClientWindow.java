@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,6 +22,7 @@ public class ClientWindow extends JFrame {
 	
 	JPanel main;
 	JLabel text;
+	JLabel background;
 	
 	JTextField textField;
 	
@@ -44,15 +46,21 @@ public class ClientWindow extends JFrame {
         
         textField = new JTextField();
         add(textField);
+
         
         textLabel = new JLabel("<html>");
         textLabel.setVerticalAlignment(JLabel.BOTTOM);
         textLabel.setFont(new Font("", Font.PLAIN, 18));
-        scrollPane = new JScrollPane(textLabel, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        
+        background = new JLabel();
+        background.setIcon(new ImageIcon("image.jpg"));
+        
+        scrollPane = new JScrollPane(background, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.add(textLabel);
         scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
         scrollPane.getVerticalScrollBar().setUnitIncrement(50);
         add(scrollPane);
-		
+        
 		addComponentListener(resizeListener);
 		resizeListener.componentResized(null); // Calls the "function" from listener
 	}
@@ -106,9 +114,9 @@ public class ClientWindow extends JFrame {
 			int sendButtonSizeX = 200;
 			int sendButtonSizeY = 25;
 			
-			textField.setBounds(7, windowH - textFieldSizeY - 44, textFieldSizeX, textFieldSizeY);
-			sendButton.setBounds(textFieldSizeX + 10, windowH - textFieldSizeY - 44, sendButtonSizeX, sendButtonSizeY);
-	        scrollPane.setBounds(7, 7, windowW - 27, windowH - textFieldSizeY - 55);
+			textField.setBounds(7, windowH - textFieldSizeY - 52, textFieldSizeX, textFieldSizeY);
+			sendButton.setBounds(textFieldSizeX + 10, windowH - textFieldSizeY - 52, sendButtonSizeX, sendButtonSizeY);
+	        scrollPane.setBounds(7, 7, windowW - 27, windowH - textFieldSizeY - 64);
 	        textLabel.setBounds(0, 0, scrollPane.getWidth() - scrollPane.getVerticalScrollBar().getWidth(), scrollPane.getHeight());
 	        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
 		}

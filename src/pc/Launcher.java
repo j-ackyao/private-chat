@@ -1,6 +1,7 @@
 package pc;
 
 import java.io.BufferedInputStream;
+import java.io.Console;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
@@ -15,6 +16,16 @@ public class Launcher {
 	static String currentDir = System.getProperty("user.dir") + "\\";
 	
 	public static void main(String[] args) {
+		
+		Console con = System.console();
+		if(con == null) {
+			try {
+				String launcherName = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+				Runtime.getRuntime().exec(new String[] {"cmd", "/c", "start", "cmd", "/k", "java -jar " + launcherName});
+				System.exit(0);
+			} catch (IOException e) {}
+		}
+		
 		try {
 			InputStream testInternet = new URL("https://google.com").openStream();
 			testInternet.close();
