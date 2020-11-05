@@ -1,7 +1,5 @@
 package pc;
 
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,22 +13,20 @@ public class Client extends Thread {
 	private static String username;
 	private static boolean connected = true;
 	private static ClientWindow clientWindow;
-	
+
 	public static void main(String[] args) throws IOException {
-		
+
 		clientWindow = new ClientWindow();
-		clientWindow.addWindowListener(new WindowListener() {
-			public void windowClosed(WindowEvent e) {}
-			public void windowIconified(WindowEvent e) {}
-			public void windowDeiconified(WindowEvent e) {}
-			public void windowActivated(WindowEvent e) {}
-			public void windowDeactivated(WindowEvent e) {}
-			public void windowOpened(WindowEvent e) {}
-			@Override
-			public void windowClosing(WindowEvent e) {new Thread(()-> {exit("safe");}).start();} // dont worry about this
-		});
-		
+
 		// Receive host ip
+		startup();
+		// Create our msgReceiver and msgSender threads, which basically handles
+		// everything
+		msgSender();
+		msgReceiver();
+	}
+
+	public static void startup() {
 		clientWindow.print("Insert server IP. 'test' for testing server. 'local' to connect to device's current IP", Data.systemFont);
 		boolean insertHost = false;
 		while (!insertHost) { // Loop to retry multiple times
@@ -38,14 +34,21 @@ public class Client extends Thread {
 
 			if ("test".equals(input)) { // Set IP to testing server
 				clientWindow.print("Connecting to testing server...", Data.systemFont);
-				insertHost = connect(Data.testServer);
+				String testServerIP = Data.accessToTestServer();
+				if(!testServerIP.isEmpty()) {
+					insertHost = connect(testServerIP);
+				}
+				else {
+					clientWindow.print("Failed to access test server (missing or faulty access files)", Data.systemErrorFont);
+				}
 			}
 
 			else if ("local".equals(input)) { // Set IP to device IP
 				String ip = Data.grabIP(); // Grabs IP of local device
 
 				if ("-1".equals(ip)) { // This is when it failed to get the IP
-					clientWindow.print("Failed to find device's IP, possible internet connection problem", Data.systemFont);
+					clientWindow.print("Failed to find device's IP, possible internet connection problem",
+							Data.systemErrorFont);
 					exit("error");
 				}
 
@@ -65,11 +68,8 @@ public class Client extends Thread {
 		String input = clientWindow.awaitNextInput();
 		username = input;
 		clientWindow.setTitle(username);
-		// Create our msgReceiver and msgSender threads, which basically handles everything
-		msgSender();
-		msgReceiver();
 	}
-	
+
 	public static void msgSender() { // Our new thread that sends messages and handles our input
 		new Thread(new Runnable() {
 			@Override
@@ -88,7 +88,8 @@ public class Client extends Thread {
 					pr.println(object);
 					pr.flush();
 				} catch (IOException ioe) {
-					clientWindow.print("Failed to get output stream of server, '" + object + "' was not sent.", Data.systemErrorFont);
+					clientWindow.print("Failed to get output stream of server, '" + object + "' was not sent.",
+							Data.systemErrorFont);
 				}
 			}
 		}).start();
@@ -112,7 +113,8 @@ public class Client extends Thread {
 
 				while (connected) {
 					try {
-						String[] input = bf.readLine().split("\\\\", 2); // Split incoming string into font and actual text
+						String[] input = bf.readLine().split("\\\\", 2); // Split incoming string into font and actual
+																			// text
 						clientWindow.print(input[1], input[0]); // Read incoming text
 					} catch (SocketException se) { // Socket disconnected / error
 						print("Server connection severed");
@@ -156,7 +158,7 @@ public class Client extends Thread {
 	public static void print(Object object) {
 		System.out.println(object);
 	}
-	
+
 	public static void exit(String exitType) {
 		connected = false;
 		try {
@@ -164,23 +166,31 @@ public class Client extends Thread {
 		} catch (IOException | NullPointerException e) {
 			// do nothing lol
 		}
-		switch(exitType) {
-		
+
+		switch (exitType) {
+
 		case "safe":
-			System.out.println("Exiting...");
-			connected = false;
+			print("Exiting...");
 			try {
 				Thread.sleep(1000);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+			}
 			System.exit(0);
-			
+
 		case "error":
-			System.out.println("Press 'enter' to continue...");
+			print("Press 'enter' to continue...");
 			clientWindow.setVisible(false);
 			try {
 				System.in.read();
-			} catch (IOException e) {}
+			} catch (IOException e) {
+			}
 			System.exit(0);
+
+		case "restart":
+			clientWindow.dispose();
+			clientWindow = new ClientWindow();
+			startup();
+			break;
 		}
 	}
 }
