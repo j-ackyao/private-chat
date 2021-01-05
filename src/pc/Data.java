@@ -12,7 +12,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import javax.crypto.Cipher;
 
 public class Data { // Data or whatever not really relevant just to make things neater and easier to handle
-	public static int port = 666;
+	public static int port = 888;
 	public static String systemFont = "color:black;font-family:'Courier New'";
 	public static String systemErrorFont = "color:red;font-family:'Courier New'";
 	public static String clientFont = "color:black;font-family:'Comic Sans MS'";

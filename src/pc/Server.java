@@ -61,7 +61,7 @@ public class Server extends Thread {
 			serverSocket = new ServerSocket(Data.port); // Open port in server
 			print("Server online");
 		} catch (IOException e1) {
-			print("Error is starting server, please retry after full exit. Else, port 888 has already been occupied"); // Usually
+			print("Error is starting server, please retry after full exit. If problem continues, port 888 is unavailable (not open to port forwarding or occupied)"); // Usually
 																														// server
 																														// is
 																														// occupied
