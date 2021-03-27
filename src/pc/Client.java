@@ -27,40 +27,57 @@ public class Client extends Thread {
 	}
 
 	public static void startup() {
-		clientWindow.print("Insert server IP. 'test' for testing server. 'local' to connect to device's current IP", Data.systemFont);
+		clientWindow.print("Insert server IP with port. 'file' to connect with server connection file. 'local' for current IP.", Data.systemFont);
 		boolean insertHost = false;
+		
 		while (!insertHost) { // Loop to retry multiple times
-			String input = clientWindow.awaitNextInput();
-
-			if ("test".equals(input)) { // Set IP to testing server
-				clientWindow.print("Connecting to testing server...", Data.systemFont);
-				String testServerIP = Data.accessToTestServer();
-				if(!testServerIP.isEmpty()) {
-					insertHost = connect(testServerIP);
-				}
-				else {
-					clientWindow.print("Failed to access test server (missing or faulty access files)", Data.systemErrorFont);
+			String[] input = clientWindow.awaitNextInput().split(":");
+			
+			if(input.length == 0) {
+				
+			}
+			
+			else if ("file".equals(input[0])) { // Set IP to testing server
+				clientWindow.print("Connecting with server file...", Data.systemFont);
+				String[] serverFile = Data.accessToServerFile().split(":");
+				if (!serverFile[0].isEmpty()) {
+					insertHost = connect(serverFile[0], serverFile[1]);
+				} else {
+					clientWindow.print("Failed to access server connection file (missing or faulty access files)",
+							Data.systemErrorFont);
 				}
 			}
 
-			else if ("local".equals(input)) { // Set IP to device IP
+			else if ("local".equals(input[0])) { // Set IP to device IP
 				String ip = Data.grabIP(); // Grabs IP of local device
 
 				if ("-1".equals(ip)) { // This is when it failed to get the IP
-					clientWindow.print("Failed to find device's IP, possible internet connection problem",
-							Data.systemErrorFont);
+					clientWindow.print("Failed to find device's IP, possible internet connection problem.", Data.systemErrorFont);
 					exit("error");
 				}
 
 				else { // Set to desired IP
-					clientWindow.print("Connecting to " + ip + "...", Data.systemFont);
-					insertHost = connect(ip);
+
+					clientWindow.print("Insert port of local private server.", Data.systemFont);
+					String port = clientWindow.awaitNextInput();
+
+					clientWindow.print("Connecting to " + ip + ":" + port + "...", Data.systemFont);
+					insertHost = connect(ip, port);
 				}
+			}
+			
+			else if (input[0].isEmpty()) {
+				clientWindow.print("Please include the IP.", Data.systemFont);
+			}
+			
+			else if (input.length == 1) {
+				clientWindow.print("Please include the port.", Data.systemFont);
 			}
 
 			else { // Set IP to inputed IP
-				clientWindow.print("Connecting to " + input + "...", Data.systemFont);
-				insertHost = connect(input);
+				clientWindow.print("Connecting to " + input[0] + ":" + input[1] + "...", Data.systemFont);
+				insertHost = connect(input[0], input[1]);
+
 			}
 		}
 
@@ -129,10 +146,11 @@ public class Client extends Thread {
 
 	static int retries = 0; // Retry counter
 
-	public static boolean connect(String ip) {
+	public static boolean connect(String ip, String stringPort) {
 		try {
-			// Create a socket to the ip and port of 8888
-			socket = new Socket(ip, Data.port);
+			int port = Integer.parseInt(stringPort);
+			// Create a socket to the ip and port of 888
+			socket = new Socket(ip, port);
 			// If managed to connect, it'll move to here
 			clientWindow.print("Successfully connected", Data.systemFont);
 			return true;
@@ -143,7 +161,7 @@ public class Client extends Thread {
 			if (retries < 5) { // If retry under 5 times, this prevents infinite loop
 				retries++;
 				clientWindow.print("Failed to connect, retrying... " + retries, Data.systemFont);
-				connect(ip); // Try to connect again
+				connect(ip, stringPort); // Try to connect again
 			}
 
 			else { // If already retried 5 times
@@ -151,6 +169,10 @@ public class Client extends Thread {
 				retries = 0;
 				return false;
 			}
+		}
+		
+		catch (IllegalArgumentException iae) {
+			clientWindow.print("Port should be an integer from 0 to 65353.", Data.systemErrorFont);
 		}
 		return false;
 	}

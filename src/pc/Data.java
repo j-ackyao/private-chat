@@ -12,15 +12,9 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import javax.crypto.Cipher;
 
 public class Data { // Data or whatever not really relevant just to make things neater and easier to handle
-	public static int port = 888;
 	public static String systemFont = "color:black;font-family:'Courier New'";
 	public static String systemErrorFont = "color:red;font-family:'Courier New'";
 	public static String clientFont = "color:black;font-family:'Comic Sans MS'";
-	
-	public static void main(String args[]) {
-		System.out.println(accessToTestServer());
-	}
-	
 	
 	public static String grabIP() { // Grabs IP
 		try {
@@ -32,18 +26,18 @@ public class Data { // Data or whatever not really relevant just to make things 
 		}
 	}
 	
-	public static String accessToTestServer() {
+	public static String accessToServerFile() {
 		try {
 			Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			
-			File privateKeyFile = new File("access.key");
-			FileInputStream keyReader = new FileInputStream("access.key");
+			File privateKeyFile = new File("privateChatServerKey.key");
+			FileInputStream keyReader = new FileInputStream("privateChatServerKeys.key");
 			byte[] encodedPrivateKey = new byte[(int) privateKeyFile.length()];
 			keyReader.read(encodedPrivateKey);
 			keyReader.close();
 			
-			File serverAccessFile = new File("testServerAccess");
-			FileInputStream accessReader = new FileInputStream("testServerAccess");
+			File serverAccessFile = new File("privateChatServerConnection");
+			FileInputStream accessReader = new FileInputStream("privateChatServerFile");
 			byte[] encodedAccess = new byte[(int) serverAccessFile.length()];
 			accessReader.read(encodedAccess);
 			accessReader.close();

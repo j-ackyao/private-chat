@@ -10,16 +10,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Server extends Thread {
 
 	public static String hostIP;
+	public static int hostPort;
 	public static ArrayList<Socket> connectedClients;
 	public static ArrayList<String> connectedNames;
 
 	public static void main(String[] args) {
 
+		
 		Console con = System.console();
 		if(con == null) {
 			try {
@@ -38,16 +41,44 @@ public class Server extends Thread {
 		if ("-1".equals(hostIP)) {
 			print("Could not find current host device's IP, possibly internet connection problem.");
 			System.exit(-1);
-		} else {
-			print("Host IP is: " + hostIP);
 		}
-
+		
+		boolean port = false;
+		
+		while(!port) {
+			print("Insert the server port to open.");
+			try {
+				int input = sc.nextInt();
+				if(input <= 65353 && input >= 0) {
+					hostPort = input;
+					port = true;
+				}
+				else {
+					print("Port out of range, try again.");
+				}
+			}
+			catch(InputMismatchException ime) {
+				print("Please insert an integer between 0 to 65353.");
+			}
+		}
+		
+		print("Host IP is: " + hostIP + ":" + hostPort);
+		
+		
+		
 		// Start accepting clients with clientAcceptor
-		clientAcceptor();
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				clientAcceptor();
+			}
+		}).start();
+		
 		while (true) { // This is for the server commands
 			switch (sc.nextLine()) {
 			case "list":
 				print(connectedClients);
+				break;
 			}
 		}
 	}
@@ -58,13 +89,14 @@ public class Server extends Thread {
 		Socket client;
 
 		try {
-			serverSocket = new ServerSocket(Data.port); // Open port in server
+			serverSocket = new ServerSocket(hostPort); // Open port in server
 			print("Server online");
 		} catch (IOException e1) {
-			print("Error is starting server, please retry after full exit. If problem continues, port 888 is unavailable (not open to port forwarding or occupied)"); // Usually
+			print("Error in starting server. The server may already be running. If problem continues, port 888 is unavailable (not open to port forwarding or occupied)"); // Usually
 																														// server
 																														// is
 																														// occupied
+			e1.printStackTrace();
 			System.exit(-1);
 		}
 		while (!serverSocket.isClosed()) { // Constantly accept new clients until server socket is closed
