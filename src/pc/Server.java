@@ -78,6 +78,15 @@ public class Server extends Thread {
 			case "list":
 				print(connectedClients);
 				break;
+			case "file":
+				try {
+					Data.generateServerFile(hostIP, hostPort);
+					print("Successfully generated server access files");
+				} catch (Exception e) {
+					print("Failed to generate server access files");
+					e.printStackTrace();
+				}
+				break;
 			}
 		}
 	}
