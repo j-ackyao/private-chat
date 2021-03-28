@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,7 +23,6 @@ public class Server extends Thread {
 
 	public static void main(String[] args) {
 
-		
 		Console con = System.console();
 		if(con == null) {
 			try {
@@ -62,7 +62,6 @@ public class Server extends Thread {
 			}
 		}
 		
-		print("Host IP is: " + hostIP + ":" + hostPort);
 		
 		
 		
@@ -90,15 +89,22 @@ public class Server extends Thread {
 
 		try {
 			serverSocket = new ServerSocket(hostPort); // Open port in server
+			Socket test = new Socket();
+			test.connect(new InetSocketAddress(hostIP, hostPort), 5000); // See if port is open by trying to connect to it with 5s timeout
+			test.close();
+			
 			print("Server online");
+			print("Host IP is: " + hostIP + ":" + hostPort);
 		} catch (IOException e1) {
-			print("Error in starting server. The server may already be running. If problem continues, port 888 is unavailable (not open to port forwarding or occupied)"); // Usually
-																														// server
-																														// is
-																														// occupied
+			print("Error in starting server. Port " + hostPort + " is unavailable (not open to port forwarding or occupied)");
+			print("Attempted IP: " + hostIP + ":" + hostPort);
 			e1.printStackTrace();
 			System.exit(-1);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		
 		while (!serverSocket.isClosed()) { // Constantly accept new clients until server socket is closed
 			try {
 
@@ -161,7 +167,7 @@ public class Server extends Thread {
 			}
 
 			public void sendToAll(String content, String font) { // Send to all Clients
-
+				print(content);
 				for (int i = 0; i < connectedClients.size(); i++) { // Find how many clients are connected and loops how
 																	// many times
 					try {

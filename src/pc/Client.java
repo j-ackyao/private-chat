@@ -1,6 +1,8 @@
 package pc;
 
 import java.io.BufferedReader;
+import java.io.Console;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -15,7 +17,21 @@ public class Client extends Thread {
 	private static ClientWindow clientWindow;
 
 	public static void main(String[] args) throws IOException {
-
+		
+		// if jar file has been renamed to debug.jar, open console
+		String fileName = new java.io.File(Client.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+		if("debug.jar".equals(fileName)) {
+			Console con = System.console();
+			if(con == null) {
+				try {
+					String launcherName = new File(Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+					Runtime.getRuntime().exec(new String[] {"cmd", "/c", "start", "cmd", "/k", "java -jar " + launcherName});
+					System.exit(0);
+				} catch (IOException e) {}
+			}
+		}
+		
+		
 		clientWindow = new ClientWindow();
 
 		// Receive host ip
@@ -27,7 +43,7 @@ public class Client extends Thread {
 	}
 
 	public static void startup() {
-		clientWindow.print("Insert server IP with port. 'file' to connect with server connection file. 'local' for current IP.", Data.systemFont);
+		clientWindow.print("Insert server IP with port. 'file' to connect with server connection file. 'local:<PORT>' for current IP.", Data.systemFont);
 		boolean insertHost = false;
 		
 		while (!insertHost) { // Loop to retry multiple times
@@ -47,24 +63,6 @@ public class Client extends Thread {
 							Data.systemErrorFont);
 				}
 			}
-
-			else if ("local".equals(input[0])) { // Set IP to device IP
-				String ip = Data.grabIP(); // Grabs IP of local device
-
-				if ("-1".equals(ip)) { // This is when it failed to get the IP
-					clientWindow.print("Failed to find device's IP, possible internet connection problem.", Data.systemErrorFont);
-					exit("error");
-				}
-
-				else { // Set to desired IP
-
-					clientWindow.print("Insert port of local private server.", Data.systemFont);
-					String port = clientWindow.awaitNextInput();
-
-					clientWindow.print("Connecting to " + ip + ":" + port + "...", Data.systemFont);
-					insertHost = connect(ip, port);
-				}
-			}
 			
 			else if (input[0].isEmpty()) {
 				clientWindow.print("Please include the IP.", Data.systemFont);
@@ -74,6 +72,20 @@ public class Client extends Thread {
 				clientWindow.print("Please include the port.", Data.systemFont);
 			}
 
+			else if ("local".equals(input[0])) { // Set IP to device IP
+				String ip = Data.grabIP(); // Grabs IP of local device
+
+				if ("-1".equals(ip)) { // This is when it failed to get the IP
+					clientWindow.print("Failed to find device's IP, possible internet connection problem.", Data.systemErrorFont);
+					exit("error");
+				}
+
+				else { // Set to local IP
+					clientWindow.print("Connecting to " + ip + ":" + input[1] + "...", Data.systemFont);
+					insertHost = connect(ip, input[1]);
+				}
+			}
+			
 			else { // Set IP to inputed IP
 				clientWindow.print("Connecting to " + input[0] + ":" + input[1] + "...", Data.systemFont);
 				insertHost = connect(input[0], input[1]);
