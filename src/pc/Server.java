@@ -97,7 +97,7 @@ public class Server extends Thread {
 			print("Host IP is: " + hostIP + ":" + hostPort);
 		} catch (IOException e1) {
 			print("Error in starting server. Port " + hostPort + " is unavailable (not open to port forwarding or occupied)");
-			print("Attempted IP: " + hostIP + ":" + hostPort);
+			print("Attempted Address: " + hostIP + ":" + hostPort);
 			e1.printStackTrace();
 			System.exit(-1);
 		} catch (Exception e) {
