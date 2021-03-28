@@ -43,7 +43,7 @@ public class Client extends Thread {
 	}
 
 	public static void startup() {
-		clientWindow.print("Insert server IP with port. 'file' to connect with server connection file. 'local:<PORT>' for current IP.", Data.systemFont);
+		clientWindow.print("Insert server IP with port. 'file' to connect with server connection file. 'local:[PORT]' for current IP.", Data.systemFont);
 		boolean insertHost = false;
 		
 		while (!insertHost) { // Loop to retry multiple times
