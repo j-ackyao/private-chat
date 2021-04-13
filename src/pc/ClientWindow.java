@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
@@ -31,6 +33,8 @@ public class ClientWindow extends JFrame {
 	ImageIcon backgroundImageIcon;
 	
 	JTextField textField;
+
+	String prevText = "";
 	
 	JButton sendButton;
 	
@@ -52,10 +56,12 @@ public class ClientWindow extends JFrame {
 		sendButton.addActionListener(sendButtonPressed);
         add(sendButton);
         
+        
         disconnectButton = new JButton("Disconnect");
         disconnectButton.addActionListener(disconnect);
         
         textField = new JTextField();
+        textField.addKeyListener(loadPrevText);
         add(textField);
         
         try {
@@ -95,7 +101,7 @@ public class ClientWindow extends JFrame {
 		});
 	}
 	
-	public static String nextInput = "";
+	public String nextInput = "";
 	public String awaitNextInput() {
 		nextInput = "";
 		while("".equals(nextInput)) {
@@ -104,13 +110,10 @@ public class ClientWindow extends JFrame {
 		return nextInput;
 	}
 	
-	public void update() { // Scroll to bottom
-		//if(scrollPane.getVerticalScrollBar().getValue() + scrollPane.getVerticalScrollBar().getWidth() >= scrollPane.getVerticalScrollBar().getMaximum()*0.9) {
-	        scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
-		//}
-		//print(Double.toString(scrollPane.getVerticalScrollBar().HEIGHT), Data.systemFont);
-		//print(Integer.toString(scrollPane.getVerticalScrollBar().getValue()), Data.systemFont);
-		//print(Integer.toString(scrollPane.getVerticalScrollBar().getMaximum()), Data.systemFont);
+	public void update() {
+		//scroll to bottom
+		scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
+		
 	}
 	
 	public void print(String text, String font) { // Print to clientwindow with given font
@@ -128,9 +131,24 @@ public class ClientWindow extends JFrame {
 			if(!input.isEmpty()) {
 				// send to client
 				nextInput = input;
+				prevText = input;
 				textField.setText("");
 			}
 		}
+	};
+	
+	KeyAdapter loadPrevText = new KeyAdapter() {
+	    public void keyPressed(KeyEvent e) {
+	    	switch(e.getKeyCode()) {
+	    	case KeyEvent.VK_UP:
+	    		// load prev text
+	        	textField.setText(prevText);
+	        	break;
+	    	case KeyEvent.VK_DOWN:
+	    		textField.setText("");
+	    		break;
+	    	}
+	    }
 	};
 	
 	ActionListener disconnect = new ActionListener() {
