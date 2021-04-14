@@ -1,5 +1,7 @@
 package pc;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -27,6 +30,7 @@ public class ClientWindow extends JFrame {
 	static int windowW = 1200;
 	static int windowH = 700;
 	
+	
 	JPanel main;
 	JLabel text;
 	JLabel background;
@@ -34,6 +38,7 @@ public class ClientWindow extends JFrame {
 	
 	JTextField textField;
 
+	String nextInput = "";
 	String prevText = "";
 	
 	JButton sendButton;
@@ -52,18 +57,17 @@ public class ClientWindow extends JFrame {
 		setResizable(true);
 		
 		sendButton = new JButton("Send");
-		getRootPane().setDefaultButton(sendButton);
 		sendButton.addActionListener(sendButtonPressed);
         add(sendButton);
-        
         
         disconnectButton = new JButton("Disconnect");
         disconnectButton.addActionListener(disconnect);
         
         textField = new JTextField();
-        textField.addKeyListener(loadPrevText);
         add(textField);
         
+        
+        // background
         try {
         	 backgroundImageIcon = new ImageIcon(ImageIO.read(new File("image.jpg")));
         	 
@@ -76,6 +80,8 @@ public class ClientWindow extends JFrame {
         background.setVerticalAlignment(JLabel.TOP);
         //add(background);
         
+        
+        
         textLabel = new JLabel("<html>");
         textLabel.setVerticalAlignment(JLabel.BOTTOM);
         textLabel.setFont(new Font("", Font.PLAIN, 18));
@@ -87,6 +93,11 @@ public class ClientWindow extends JFrame {
         scrollPane.getVerticalScrollBar().setUnitIncrement(50);
         add(scrollPane);
         
+        
+        for(Component c : getComponents(getRootPane())) {
+        	c.addKeyListener(globalKeyListener);
+        }
+        
 		addComponentListener(resizeListener);
 		resizeListener.componentResized(null); // Calls the "function" from listener
 		addWindowListener(new WindowListener() {
@@ -97,11 +108,22 @@ public class ClientWindow extends JFrame {
 			public void windowDeactivated(WindowEvent e) {}
 			public void windowOpened(WindowEvent e) {}
 			@Override
-			public void windowClosing(WindowEvent e) {new Thread(()-> {Client.exit("safe");}).start();} // dont worry about this
+			public void windowClosing(WindowEvent e) {new Thread(()-> {Client.exit("safe");}).start();} // Exit properly
 		});
 	}
 	
-	public String nextInput = "";
+	public static ArrayList<Component> getComponents(Container container) {
+		ArrayList<Component> returnList = new ArrayList<Component>();
+	    Component[] components = container.getComponents();
+	    for (Component c : components) {
+	        returnList.add(c);
+	        if (c instanceof Container) {
+	        	returnList.addAll(getComponents((Container) c));
+	        }
+	    }
+	    return returnList;
+	}
+	
 	public String awaitNextInput() {
 		nextInput = "";
 		while("".equals(nextInput)) {
@@ -110,10 +132,31 @@ public class ClientWindow extends JFrame {
 		return nextInput;
 	}
 	
+	KeyAdapter globalKeyListener = new KeyAdapter() {
+	    public void keyReleased(KeyEvent e) {
+	    	
+			switch(e.getKeyCode()) {
+			
+			case KeyEvent.VK_ENTER:
+				sendButton.doClick();
+				break;
+			
+	    	case KeyEvent.VK_UP:
+	    		// load prev text
+	        	textField.setText(prevText);
+	        	break;
+	        	
+	    	case KeyEvent.VK_DOWN:
+	    		// clear text
+	    		textField.setText("");
+	    		break;
+	    	}
+	    }
+	};
+	
 	public void update() {
 		//scroll to bottom
 		scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum());
-		
 	}
 	
 	public void print(String text, String font) { // Print to clientwindow with given font
@@ -135,20 +178,6 @@ public class ClientWindow extends JFrame {
 				textField.setText("");
 			}
 		}
-	};
-	
-	KeyAdapter loadPrevText = new KeyAdapter() {
-	    public void keyPressed(KeyEvent e) {
-	    	switch(e.getKeyCode()) {
-	    	case KeyEvent.VK_UP:
-	    		// load prev text
-	        	textField.setText(prevText);
-	        	break;
-	    	case KeyEvent.VK_DOWN:
-	    		textField.setText("");
-	    		break;
-	    	}
-	    }
 	};
 	
 	ActionListener disconnect = new ActionListener() {

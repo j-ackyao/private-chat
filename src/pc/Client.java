@@ -103,7 +103,7 @@ public class Client extends Thread {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				sendToServer("'" + username + "' connected");
+				sendToServer("\"" + username + "\" connected");
 
 				while (connected) { // Actual reading
 					String input = clientWindow.awaitNextInput(); // Client input
