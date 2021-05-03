@@ -9,7 +9,9 @@ Preferably Windows operating system
 
 # Instructions
 -Download the latest launcher (or latest version) in releases
+
 -Open the jar file
+
 -Type in your input in the format of your desired way of connecting to a private chat server
 
 Here are the following ways to connect:
