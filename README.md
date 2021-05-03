@@ -26,10 +26,12 @@ _Example_
 
 ## Connecting with _server access file_
 If provided with a server access file and server access key, you may connect to the private chat server by using these files.
+
 Place the server access file and key in the same directory as the client jar file.
+
 Simply type in "file" into the textfield and the connection to the server will be established.
 
-It is important that you do not rename the server access file and key, otherwise the program will not find the files.
+**It is important that you do not rename the server access file and key, otherwise the program will not find the files.**
 
 _Example_
 ![image](https://user-images.githubusercontent.com/60021675/116835638-35aeb780-ab78-11eb-859b-d9724050f08e.png)
@@ -39,6 +41,7 @@ _Example_
 
 ## Connecting to local IP address
 If you are trying to connect to a private chat server which is on hosted on the same network as your current device, you may connect to it using this method.
+
 Simply type in "local:" and the port of the private chat server following it.
 
 _Example_
