@@ -2,8 +2,9 @@ A simple private chat developed in Java
 
 Currently only supporting windows but may work on other operating systems
 
-#### Download
+### Download
 [Launcher 1.0](https://github.com/crowwastaken/private-chat/releases/download/L1.0/launcher-L1.0.jar)
+
 
 # Requirements
 Java 8
