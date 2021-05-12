@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.KeyFactory;
@@ -20,13 +22,52 @@ public class Data { // Data or whatever not really relevant just to make things 
 	public static String systemErrorFont = "color:red;font-family:'Courier New'";
 	public static String clientFont = "color:black;font-family:'Comic Sans MS'";
 	
-	public static String grabIP() { // Grabs IP
+
+	public static String releasesHome = "https://github.com/crowwastaken/private-chat/releases/";
+	public static String downloadHome = "https://github.com/crowwastaken/private-chat/releases/download/";
+	public static String testHome = "https://github.com/crowwastaken/testRepo/releases/download/";
+	public static String currentDir = System.getProperty("user.dir") + "\\";
+	
+	public static String clientVersion = "1.0.6";
+	
+	public static String getIP() { // Grabs IP
 		try {
 			URL ipGrabber = new URL("http://bot.whatismyipaddress.com");
 			BufferedReader br = new BufferedReader(new InputStreamReader(ipGrabber.openStream()));
 			return br.readLine().trim();
 		} catch (Exception e) { // If failed to grab IP
 			return "-1";
+		}
+	}
+	
+	public static String getLatestClientVer(String startVersion) {
+		
+		if(!checkClientVer(startVersion)) {
+			startVersion = "1.0.0";
+		}
+		
+		float checkingVer = Float.parseFloat(startVersion.substring(2));
+		String latestVer = "1.0.0";
+		
+		boolean checking = true;
+		while(checking) {
+			latestVer = "1." + checkingVer;
+			checkingVer += 0.1;
+			checking = checkClientVer("1." + checkingVer);
+		}
+		
+		
+		
+		return latestVer;
+	}
+	
+	public static boolean checkClientVer(String ver) {
+		try {
+			InputStream test = new URL(releasesHome + ver).openStream();
+			test.close();
+			return true;
+		} catch (IOException e) {
+			return false;
 		}
 	}
 	

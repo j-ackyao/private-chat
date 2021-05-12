@@ -11,9 +11,6 @@ import java.net.URL;
 
 public class Launcher {
 	
-	static String downloadHome = "https://github.com/crowwastaken/private-chat/releases/download/";
-	static String testHome = "https://github.com/crowwastaken/testRepo/releases/download/";
-	static String currentDir = System.getProperty("user.dir") + "\\";
 	
 	public static void main(String[] args) {
 		
@@ -33,7 +30,7 @@ public class Launcher {
 			print("No internet connection (or google is down), please try again");
 		}
 		
-		File[] files = new File(currentDir).listFiles(new FileFilter() {
+		File[] files = new File(Data.currentDir).listFiles(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
 				String fileName = file.getName();
@@ -46,14 +43,12 @@ public class Launcher {
 			}
 		});
 		
-
+		// check current version of client that user has
 		String currentVer = "1.0.0";
-		String latestVer = "";
-		boolean checking = true;
 		if(files.length != 0) {
-			currentVer = files[0].toString().replace(currentDir, "").replace("client-", "").replace(".jar", "");
-			if(!checkClientVer(currentVer)) {
-				currentVer = "0.0.0";
+			currentVer = files[0].toString().replace(Data.currentDir, "").replace("client-", "").replace(".jar", "");
+			if(!Data.checkClientVer(currentVer)) {
+				currentVer = "1.0.0";
 				print("Invalid current version");
 			}
 			else {
@@ -62,16 +57,12 @@ public class Launcher {
 			}
 		}
 		else {
-			currentVer = "0.0.0";
+			// if invalid version or 
+			currentVer = "1.0.0";
 			print("No release ver found");
 		}
 		
-		float checkingVer = Float.parseFloat(currentVer.substring(2));
-		while(checking) {
-			latestVer = "1." + checkingVer;
-			checkingVer += 0.1;
-			checking = checkClientVer("1." + checkingVer);
-		}
+		String latestVer = Data.getLatestClientVer(currentVer);
 		
 		if(latestVer.equals(currentVer)) {
 			print("Up to date!");
@@ -91,19 +82,9 @@ public class Launcher {
 		}
 	}
 	
-	public static boolean checkClientVer(String ver) {
-		try {
-			InputStream test = new URL(downloadHome + ver + "/client-" + ver + ".jar").openStream();
-			test.close();
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
-	}
-	
 	public static void downloadClient(String ver) {
 		try {
-			BufferedInputStream in = new BufferedInputStream(new URL(downloadHome + ver + "/client-" + ver + ".jar").openStream());
+			BufferedInputStream in = new BufferedInputStream(new URL(Data.downloadHome + ver + "/client-" + ver + ".jar").openStream());
 			FileOutputStream fileOutputStream = new FileOutputStream("client-" + ver + ".jar");
 			byte dataBuffer[] = new byte[1024];
 			int bytesRead;

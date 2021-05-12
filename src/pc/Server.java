@@ -37,7 +37,7 @@ public class Server extends Thread {
 		connectedClients = new ArrayList<Socket>();
 
 		// Grab IP of server host
-		hostIP = Data.grabIP();
+		hostIP = Data.getIP();
 		if ("-1".equals(hostIP)) {
 			print("Could not find current host device's IP, possibly internet connection problem.");
 			System.exit(-1);

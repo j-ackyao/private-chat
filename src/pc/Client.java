@@ -34,6 +34,14 @@ public class Client extends Thread {
 		
 		clientWindow = new ClientWindow();
 
+		//check version
+		if(Float.parseFloat(Data.clientVersion.substring(2)) > Float.parseFloat(Data.getLatestClientVer(Data.clientVersion).substring(2))) {
+			clientWindow.print("Warning: This client is invalid and the latest version should be downloaded", Data.systemErrorFont);
+		}
+		else if(!Data.clientVersion.equals(Data.getLatestClientVer(Data.clientVersion))) {
+			clientWindow.print("Warning: This client is outdated and the new version should be downloaded", Data.systemErrorFont);
+		}
+		
 		// Receive host ip
 		startup();
 		// Create our msgReceiver and msgSender threads, which basically handles
@@ -73,7 +81,7 @@ public class Client extends Thread {
 			}
 
 			else if ("local".equals(input[0])) { // Set IP to device IP
-				String ip = Data.grabIP(); // Grabs IP of local device
+				String ip = Data.getIP(); // Grabs IP of local device
 
 				if ("-1".equals(ip)) { // This is when it failed to get the IP
 					clientWindow.print("Failed to find device's IP, possible internet connection problem.", Data.systemErrorFont);
