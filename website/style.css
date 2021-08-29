@@ -1,0 +1,89 @@
+html {
+  background-color: rgb(66, 71, 78);
+}
+
+header {
+    color: rgb(255, 255, 255);
+    text-align: center;
+    font-size: 72px;
+    border: 4px solid;
+    border-radius: 8px;
+    border-color: rgb(30, 33, 36);
+    background-color:#000000;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body {
+    color: white;
+}
+
+p {
+    color: white;
+}
+
+a {
+  color: white;
+}
+
+.box {
+  color: black;
+  font-size: 30px;
+	font-family: arial;
+  border: 4px solid;
+  border-radius: 8px;
+  border-color: rgb(30, 33, 36);
+  background-color:#23272A;
+  margin-left: auto;
+  margin-right: auto;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	padding-left: 40px;
+	padding-right: 40px;
+}
+
+.boxButton {
+    width: auto;
+    height: auto;
+    background-color:white;
+    border: 2px solid black;
+    color: black;
+    text-align: center;
+    font-size: 32px;
+    padding: 20px;
+    cursor: pointer;
+}
+
+.boxButton:hover {
+    border: 4px solid rgb(0, 0, 0);
+    padding: 18px;
+}
+
+.boxButton:active {
+    background-color:rgb(201, 201, 201);
+}
+
+.clickableText {
+  color: rgb(18, 114, 224);
+  width: 0px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.clickableText:hover {
+  color:rgb(112, 191, 255);
+}
+
+.leftColumn {
+  float: left;
+  text-align: left;
+  width: 49%;
+  height: 100%;
+}
+
+.rightColumn {
+  float: right;
+  text-align: right;
+  width: 49%;
+  height: 100%;
+}
