@@ -8,6 +8,7 @@ Currently only supporting windows but may work on other operating systems
 
 # Requirements
 Java 8
+
 Preferably Windows operating system
 
 # Instructions
