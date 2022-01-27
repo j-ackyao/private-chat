@@ -37,10 +37,28 @@ public class Server extends Thread {
 		connectedClients = new ArrayList<Socket>();
 
 		// Grab IP of server host
-		hostIP = Data.getIP();
+		hostIP = Data.getPrivateIP();
 		if ("-1".equals(hostIP)) {
-			print("Could not find current host device's IP, possibly internet connection problem.");
+			print("Could not find current host device's IP, possibly  connection problem.");
 			System.exit(-1);
+		}
+		
+		boolean lan = false;
+		while(!lan) {
+			print("Host on LAN? (y/n)");
+			String input = sc.nextLine();
+			if(input.equals("y")) {
+				hostIP = Data.getPrivateIP();
+				lan = true;
+			}
+			else if(input.equals("n")) {
+				hostIP = Data.getPublicIP();
+				lan = true;
+			}
+			if ("-1".equals(hostIP)) {
+				print("Could not find current host device's IP, possibly  connection problem.");
+				System.exit(-1);
+			}
 		}
 		
 		boolean port = false;

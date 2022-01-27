@@ -33,7 +33,9 @@ public class Client extends Thread {
 		
 		
 		clientWindow = new ClientWindow();
-
+		
+		clientWindow.print("Checking client version...", Data.systemFont);
+		
 		//check version
 		if(Float.parseFloat(Data.clientVersion.substring(2)) > Float.parseFloat(Data.getLatestClientVer(Data.clientVersion).substring(2))) {
 			clientWindow.print("Warning: This client is invalid and the latest version should be downloaded", Data.systemErrorFont);
@@ -81,7 +83,7 @@ public class Client extends Thread {
 			}
 
 			else if ("local".equals(input[0])) { // Set IP to device IP
-				String ip = Data.getIP(); // Grabs IP of local device
+				String ip = Data.getPrivateIP(); // Grabs IP of local device
 
 				if ("-1".equals(ip)) { // This is when it failed to get the IP
 					clientWindow.print("Failed to find device's IP, possible internet connection problem.", Data.systemErrorFont);

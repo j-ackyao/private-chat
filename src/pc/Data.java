@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.URL;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -30,11 +31,19 @@ public class Data { // Data or whatever not really relevant just to make things 
 	
 	public static String clientVersion = "1.0.6";
 	
-	public static String getIP() { // Grabs IP
+	public static String getPublicIP() { // Grabs IP
 		try {
-			URL ipGrabber = new URL("http://bot.whatismyipaddress.com");
+			URL ipGrabber = new URL("http://checkip.amazonaws.com");
 			BufferedReader br = new BufferedReader(new InputStreamReader(ipGrabber.openStream()));
 			return br.readLine().trim();
+		} catch (Exception e) { // If failed to grab IP
+			return "-1";
+		}
+	}
+	
+	public static String getPrivateIP() { // Grabs IP
+		try {
+			return InetAddress.getLocalHost().getHostAddress();
 		} catch (Exception e) { // If failed to grab IP
 			return "-1";
 		}

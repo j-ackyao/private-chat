@@ -36,6 +36,10 @@ function downloadJar(type){
     var ver = document.getElementById('launcher').innerHTML;
     window.open("https://github.com/crowwastaken/private-chat/releases/download/" + ver + "/launcher-" + ver + ".jar", '_blank').focus();
   }
+  else if(type == 'server'){
+    var ver = document.getElementById('server').innerHTML;
+    window.open("https://github.com/crowwastaken/private-chat/releases/download/" + ver + "/server-" + ver + ".jar", '_blank').focus();
+  }
 }
 
 function downloadMisc(name){
