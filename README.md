@@ -2,6 +2,8 @@ A simple private chat developed in Java
 
 Currently only supporting windows but may work on other operating systems
 
+![image](https://github.com/j-ackyao/private-chat/assets/60021675/c387bbdd-7989-4f51-9130-2cada8856416)
+
 ### Download
 [Launcher 1.0](https://github.com/crowwastaken/private-chat/releases/download/L1.0/launcher-L1.0.jar)
 
@@ -50,3 +52,5 @@ Simply type in "local:" and the port of the private chat server following it.
 
 _Example_
 ![image](https://user-images.githubusercontent.com/60021675/116835804-e9b04280-ab78-11eb-8256-3932281752fe.png)
+
+
